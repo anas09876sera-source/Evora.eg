@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Evora — Premium Fashion</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --black: #0a0a0a;
+    --white: #ffffff;
+    --cream: #f5f3ef;
+    --gold: #b89b6a;
+    --gold-light: #d4b896;
+    --gray: #888;
+    --light-gray: #e8e6e2;
+    --text: #1a1a1a;
+    --muted: #666;
+  }
+  body { font-family: 'Georgia', serif; background: var(--white); color: var(--text); }
+
+  /* NAV */
+  nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.2rem 4rem; border-bottom: 1px solid var(--light-gray);
+    position: sticky; top: 0; background: var(--white); z-index: 100;
+  }
+  .logo { font-size: 1.8rem; letter-spacing: 0.3em; font-weight: 400; text-transform: uppercase; color: var(--black); text-decoration: none; }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a { text-decoration: none; font-family: 'Arial', sans-serif; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text); transition: color 0.2s; }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-right { display: flex; gap: 1.5rem; align-items: center; }
+  .cart-btn { background: none; border: none; cursor: pointer; font-family: 'Arial', sans-serif; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); position: relative; }
+  .cart-count { background: var(--gold); color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; display: inline-flex; align-items: center; justify-content: center; margin-left: 4px; }
+
+  /* HERO */
+  .hero {
+    background: var(--black); color: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    height: 90vh; text-align: center; position: relative; overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1410 50%, #0a0a0a 100%);
+  }
+  .hero-content { position: relative; z-index: 2; }
+  .hero-tag { font-family: 'Arial', sans-serif; font-size: 0.7rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.5rem; }
+  .hero h1 { font-size: clamp(3rem, 8vw, 7rem); font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; line-height: 1; margin-bottom: 1.5rem; }
+  .hero p { font-family: 'Arial', sans-serif; font-size: 0.85rem; letter-spacing: 0.15em; color: #aaa; margin-bottom: 3rem; }
+  .btn-primary {
+    display: inline-block; padding: 1rem 3rem; border: 1px solid var(--gold);
+    color: var(--gold); text-decoration: none; font-family: 'Arial', sans-serif;
+    font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
+    transition: all 0.3s; cursor: pointer; background: none;
+  }
+  .btn-primary:hover { background: var(--gold); color: var(--black); }
+
+  /* SECTION TITLES */
+  .section { padding: 5rem 4rem; }
+  .section-title { text-align: center; margin-bottom: 3rem; }
+  .section-title h2 { font-size: 2rem; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .section-title p { font-family: 'Arial', sans-serif; font-size: 0.8rem; color: var(--muted); letter-spacing: 0.1em; }
+  .gold-line { width: 40px; height: 1px; background: var(--gold); margin: 1rem auto; }
+
+  /* PRODUCTS */
+  .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2.5rem; }
+  .product-card { cursor: pointer; }
+  .product-img {
+    width: 100%; aspect-ratio: 3/4; background: var(--cream);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1rem; overflow: hidden; position: relative;
+  }
+  .product-img-inner { font-size: 5rem; opacity: 0.3; }
+  .product-badge {
+    position: absolute; top: 1rem; left: 1rem;
+    background: var(--black); color: var(--white);
+    font-family: 'Arial', sans-serif; font-size: 0.6rem; letter-spacing: 0.15em;
+    text-transform: uppercase; padding: 0.3rem 0.6rem;
+  }
+  .product-info h3 { font-size: 1rem; font-weight: 400; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.3rem; }
+  .product-info .price { font-family: 'Arial', sans-serif; font-size: 0.9rem; color: var(--gold); }
+  .product-info .price-original { text-decoration: line-through; color: var(--muted); margin-right: 0.5rem; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    z-index: 999; display: none; align-items: center; justify-content: center; padding: 2rem;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: var(--white); max-width: 800px; width: 100%;
+    display: grid; grid-template-columns: 1fr 1fr; max-height: 90vh; overflow-y: auto;
+  }
+  .modal-img { background: var(--cream); display: flex; align-items: center; justify-content: center; min-height: 400px; font-size: 8rem; opacity: 0.3; }
+  .modal-info { padding: 2.5rem; }
+  .modal-info h2 { font-size: 1.5rem; font-weight: 300; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .modal-price { font-family: 'Arial', sans-serif; font-size: 1.2rem; color: var(--gold); margin-bottom: 1.5rem; }
+  .modal-desc { font-family: 'Arial', sans-serif; font-size: 0.85rem; line-height: 1.7; color: var(--muted); margin-bottom: 2rem; }
+  .size-label { font-family: 'Arial', sans-serif; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.8rem; }
+  .sizes { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2rem; }
+  .size-btn {
+    width: 44px; height: 44px; border: 1px solid var(--light-gray); background: none;
+    font-family: 'Arial', sans-serif; font-size: 0.75rem; cursor: pointer; transition: all 0.2s;
+  }
+  .size-btn:hover, .size-btn.selected { border-color: var(--black); background: var(--black); color: var(--white); }
+  .qty-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+  .qty-btn { width: 32px; height: 32px; border: 1px solid var(--light-gray); background: none; cursor: pointer; font-size: 1rem; }
+  .qty-display { font-family: 'Arial', sans-serif; font-size: 1rem; min-width: 24px; text-align: center; }
+  .add-cart-btn {
+    width: 100%; padding: 1rem; background: var(--black); color: var(--white); border: none;
+    font-family: 'Arial', sans-serif; font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase;
+    cursor: pointer; transition: background 0.2s; margin-bottom: 0.8rem;
+  }
+  .add-cart-btn:hover { background: var(--gold); }
+  .close-btn {
+    position: absolute; top: 1rem; right: 1rem; background: none; border: none;
+    font-size: 1.5rem; cursor: pointer; z-index: 10;
+  }
+
+  /* CART DRAWER */
+  .cart-drawer {
+    position: fixed; right: -450px; top: 0; width: 420px; height: 100vh;
+    background: var(--white); z-index: 1000; transition: right 0.4s; padding: 2rem;
+    border-left: 1px solid var(--light-gray); display: flex; flex-direction: column; overflow-y: auto;
+  }
+  .cart-drawer.open { right: 0; }
+  .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--light-gray); }
+  .cart-header h3 { font-size: 1rem; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 400; }
+  .cart-item { display: flex; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--light-gray); }
+  .cart-item-img { width: 70px; height: 90px; background: var(--cream); display: flex; align-items: center; justify-content: center; font-size: 2rem; opacity: 0.5; flex-shrink: 0; }
+  .cart-item-details { flex: 1; }
+  .cart-item-details h4 { font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.3rem; }
+  .cart-item-details p { font-family: 'Arial', sans-serif; font-size: 0.75rem; color: var(--muted); }
+  .cart-item-price { font-family: 'Arial', sans-serif; font-size: 0.9rem; color: var(--gold); margin-top: 0.5rem; }
+  .remove-item { background: none; border: none; cursor: pointer; font-size: 0.8rem; color: var(--muted); font-family: 'Arial', sans-serif; }
+  .cart-footer { margin-top: auto; padding-top: 1.5rem; border-top: 1px solid var(--light-gray); }
+  .cart-total { display: flex; justify-content: space-between; font-family: 'Arial', sans-serif; font-size: 0.9rem; margin-bottom: 1.5rem; }
+  .empty-cart { text-align: center; padding: 3rem 0; color: var(--muted); font-family: 'Arial', sans-serif; font-size: 0.85rem; }
+
+  /* CHECKOUT */
+  .checkout-section { display: none; }
+  .checkout-section.active { display: block; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-group { margin-bottom: 1.2rem; }
+  .form-group label { font-family: 'Arial', sans-serif; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; display: block; margin-bottom: 0.4rem; color: var(--muted); }
+  .form-group input, .form-group select {
+    width: 100%; padding: 0.7rem; border: 1px solid var(--light-gray); font-family: 'Arial', sans-serif;
+    font-size: 0.85rem; outline: none; transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus { border-color: var(--gold); }
+  .form-full { grid-column: 1 / -1; }
+  .payment-methods { display: flex; gap: 0.8rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .payment-method { padding: 0.6rem 1rem; border: 1px solid var(--light-gray); cursor: pointer; font-family: 'Arial', sans-serif; font-size: 0.75rem; transition: all 0.2s; background: none; }
+  .payment-method.selected { border-color: var(--gold); background: #fdf8f2; }
+  .payment-icons { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; margin-bottom: 1rem; }
+  .payment-icon { background: var(--cream); padding: 0.4rem 0.8rem; font-size: 0.7rem; font-family: 'Arial', sans-serif; letter-spacing: 0.05em; border-radius: 3px; }
+  .section-divider { font-family: 'Arial', sans-serif; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin: 1.5rem 0 1rem; border-bottom: 1px solid var(--light-gray); padding-bottom: 0.5rem; }
+  .order-summary-mini { background: var(--cream); padding: 1.5rem; margin-bottom: 1.5rem; }
+  .order-row { display: flex; justify-content: space-between; font-family: 'Arial', sans-serif; font-size: 0.8rem; margin-bottom: 0.5rem; }
+  .order-row.total { font-size: 0.9rem; font-weight: 600; padding-top: 0.8rem; border-top: 1px solid var(--light-gray); margin-top: 0.8rem; color: var(--gold); }
+  .success-msg { text-align: center; padding: 2rem; }
+  .success-msg h2 { font-size: 1.5rem; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 1rem; }
+  .success-msg p { font-family: 'Arial', sans-serif; font-size: 0.85rem; color: var(--muted); line-height: 1.7; }
+  .checkmark { font-size: 3rem; margin-bottom: 1rem; color: var(--gold); }
+
+  /* FEATURES */
+  .features { background: var(--cream); }
+  .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: center; }
+  .feature-item { padding: 1rem; }
+  .feature-icon { font-size: 2rem; margin-bottom: 1rem; }
+  .feature-item h4 { font-size: 0.85rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .feature-item p { font-family: 'Arial', sans-serif; font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+
+  /* FOOTER */
+  footer { background: var(--black); color: var(--white); padding: 3rem 4rem; }
+  .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 2rem; }
+  .footer-col h4 { font-size: 0.75rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
+  .footer-col ul { list-style: none; }
+  .footer-col ul li { margin-bottom: 0.5rem; }
+  .footer-col ul li a { font-family: 'Arial', sans-serif; font-size: 0.8rem; color: #888; text-decoration: none; transition: color 0.2s; }
+  .footer-col ul li a:hover { color: var(--white); }
+  .footer-bottom { border-top: 1px solid #222; padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+  .footer-bottom p { font-family: 'Arial', sans-serif; font-size: 0.75rem; color: #555; }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
+    background: var(--black); color: var(--white); padding: 0.8rem 2rem;
+    font-family: 'Arial', sans-serif; font-size: 0.8rem; letter-spacing: 0.1em;
+    z-index: 9999; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .section { padding: 3rem 1.5rem; }
+    .modal { grid-template-columns: 1fr; }
+    .modal-img { min-height: 200px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .cart-drawer { width: 100%; right: -100%; }
+    footer { padding: 2rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav>
+  <a href="#" class="logo">Evora</a>
+  <ul class="nav-links">
+    <li><a href="#collection">Collection</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="cart-btn" onclick="toggleCart()">
+      Bag <span class="cart-count" id="cart-count">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <p class="hero-tag">New Collection — 2025</p>
+    <h1>Evora</h1>
+    <p>Refined elegance. Timeless design.</p>
+    <a href="#collection" class="btn-primary">Shop Now</a>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section class="section" id="collection">
+  <div class="section-title">
+    <h2>The Collection</h2>
+    <div class="gold-line"></div>
+    <p>Curated pieces for the discerning wardrobe</p>
+  </div>
+  <div class="products-grid" id="products-grid"></div>
+</section>
+
+<!-- FEATURES -->
+<section class="section features">
+  <div class="features-grid">
+    <div class="feature-item">
+      <div class="feature-icon">✦</div>
+      <h4>Free Shipping</h4>
+      <p>Complimentary shipping on all orders over $150</p>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">◈</div>
+      <h4>Easy Returns</h4>
+      <p>30-day hassle-free returns and exchanges</p>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">❖</div>
+      <h4>Secure Payment</h4>
+      <p>SSL encrypted checkout with multiple payment options</p>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">◇</div>
+      <h4>Premium Quality</h4>
+      <p>Ethically sourced materials, crafted to last</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="contact">
+  <div class="footer-grid">
+    <div class="footer-col">
+      <h4>Evora</h4>
+      <p style="font-family: Arial, sans-serif; font-size: 0.8rem; color: #666; line-height: 1.7;">
+        Premium fashion for those who appreciate refined elegance and timeless design.
+      </p>
+    </div>
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <ul>
+        <li><a href="#">New Arrivals</a></li>
+        <li><a href="#">Women</a></li>
+        <li><a href="#">Men</a></li>
+        <li><a href="#">Accessories</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Help</h4>
+      <ul>
+        <li><a href="#">Sizing Guide</a></li>
+        <li><a href="#">Shipping Info</a></li>
+        <li><a href="#">Returns</a></li>
+        <li><a href="#">FAQ</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="#">anas09876sera@gmail.com</a></li>
+        <li><a href="#">01158599266</a></li>
+        <li><a href="https://www.instagram.com/el__sha3rawy/">Instagram</a></li>
+        <li><a href="#">Pinterest</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2025 Evora. All rights reserved.</p>
+    <p>Privacy Policy · Terms of Service</p>
+  </div>
+</footer>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" style="position:relative;">
+    <button class="close-btn" onclick="closeModal()">×</button>
+    <div class="modal-img" id="modal-img"></div>
+    <div class="modal-info">
+      <h2 id="modal-name"></h2>
+      <div class="modal-price" id="modal-price"></div>
+      <div class="modal-desc" id="modal-desc"></div>
+      <div class="size-label">Select Size</div>
+      <div class="sizes" id="modal-sizes"></div>
+      <div class="size-label">Quantity</div>
+      <div class="qty-row">
+        <button class="qty-btn" onclick="changeQty(-1)">−</button>
+        <span class="qty-display" id="qty-display">1</span>
+        <button class="qty-btn" onclick="changeQty(1)">+</button>
+      </div>
+      <button class="add-cart-btn" onclick="addToCart()">Add to Bag</button>
+    </div>
+  </div>
+</div>
+
+<!-- CART DRAWER -->
+<div class="cart-drawer" id="cart-drawer">
+  <div class="cart-header">
+    <h3>Your Bag</h3>
+    <button style="background:none;border:none;cursor:pointer;font-size:1.2rem;" onclick="toggleCart()">×</button>
+  </div>
+  <div id="cart-items-list"></div>
+  <div class="cart-footer" id="cart-footer" style="display:none;">
+    <div class="cart-total">
+      <span style="font-family:Arial,sans-serif;font-size:0.8rem;letter-spacing:0.1em;text-transform:uppercase;">Total</span>
+      <span id="cart-total-amount" style="color:var(--gold);"></span>
+    </div>
+    <button class="add-cart-btn" onclick="showCheckout()">Proceed to Checkout</button>
+  </div>
+</div>
+
+<!-- CHECKOUT OVERLAY -->
+<div class="modal-overlay" id="checkout-overlay">
+  <div class="modal" style="grid-template-columns:1fr; max-width:600px; position:relative; padding:2.5rem;">
+    <button class="close-btn" onclick="closeCheckout()">×</button>
+
+    <!-- STEP 1: Info -->
+    <div class="checkout-section active" id="step-info">
+      <h2 style="font-size:1.2rem;letter-spacing:0.2em;text-transform:uppercase;font-weight:400;margin-bottom:1.5rem;">Checkout</h2>
+      <div id="checkout-order-summary" class="order-summary-mini"></div>
+
+      <div class="section-divider">Shipping Information</div>
+      <div class="form-grid">
+        <div class="form-group"><label>First Name</label><input type="text" id="fname" placeholder="Jane" /></div>
+        <div class="form-group"><label>Last Name</label><input type="text" id="lname" placeholder="Smith" /></div>
+        <div class="form-group form-full"><label>Email</label><input type="email" id="email" placeholder="jane@example.com" /></div>
+        <div class="form-group form-full"><label>Address</label><input type="text" id="address" placeholder="123 Fashion Ave" /></div>
+        <div class="form-group"><label>City</label><input type="text" id="city" placeholder="New York" /></div>
+        <div class="form-group"><label>Zip Code</label><input type="text" id="zip" placeholder="10001" /></div>
+        <div class="form-group form-full">
+          <label>Country</label>
+          <select id="country">
+            <option>United States</option>
+            <option>United Kingdom</option>
+            <option>France</option>
+            <option>Germany</option>
+            <option>Egypt</option>
+            <option>UAE</option>
+            <option>Saudi Arabia</option>
+            <option>Canada</option>
+            <option>Australia</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section-divider">Payment Method</div>
+      <div class="payment-methods">
+        <button class="payment-method selected" onclick="selectPayment(this,'card')">Credit / Debit Card</button>
+        <button class="payment-method" onclick="selectPayment(this,'paypal')">PayPal</button>
+        <button class="payment-method" onclick="selectPayment(this,'apple')">Apple Pay</button>
+        <button class="payment-method" onclick="selectPayment(this,'cod')">Cash on Delivery</button>
+      </div>
+      <div class="payment-icons">
+        <span class="payment-icon">VISA</span>
+        <span class="payment-icon">Mastercard</span>
+        <span class="payment-icon">Amex</span>
+        <span class="payment-icon">PayPal</span>
+        <span class="payment-icon">Apple Pay</span>
+      </div>
+
+      <div id="card-fields">
+        <div class="form-group"><label>Card Number</label><input type="text" id="card-num" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCard(this)" /></div>
+        <div class="form-grid">
+          <div class="form-group"><label>Expiry</label><input type="text" id="expiry" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)" /></div>
+          <div class="form-group"><label>CVV</label><input type="text" id="cvv" placeholder="123" maxlength="4" /></div>
+        </div>
+      </div>
+
+      <button class="add-cart-btn" onclick="placeOrder()">Place Order</button>
+    </div>
+
+    <!-- STEP 2: Success -->
+    <div class="checkout-section" id="step-success">
+      <div class="success-msg">
+        <div class="checkmark">✦</div>
+        <h2>Order Confirmed</h2>
+        <p>Thank you for shopping with <strong>Evora</strong>.<br/>
+        Your order has been received and will be shipped within 2–3 business days.<br/>
+        A confirmation email is on its way.</p>
+        <button class="btn-primary" style="margin-top:2rem;" onclick="closeCheckout(); resetCart();">Continue Shopping</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const products = [
+  { id:1, name:"Silk Wrap Dress", price:395, emoji:"👗", badge:"New", desc:"A fluid wrap dress in pure silk charmeuse. Features a self-tie waist and bias-cut skirt for an effortlessly elegant silhouette.", sizes:["XS","S","M","L","XL"] },
+  { id:2, name:"Tailored Blazer", price:520, origPrice:650, emoji:"🧥", badge:"Sale", desc:"Sharp, structured blazer with a single-button closure. Cut from Italian wool suiting — perfect for the modern professional.", sizes:["XS","S","M","L","XL","XXL"] },
+  { id:3, name:"Wide Leg Trousers", price:285, emoji:"👖", desc:"High-rise wide-leg trousers in crepe fabric. A wardrobe staple that bridges elegance and comfort.", sizes:["XS","S","M","L","XL"] },
+  { id:4, name:"Linen Shirt", price:195, emoji:"👔", badge:"Bestseller", desc:"Relaxed-fit linen shirt in a classic silhouette. Hand-finished buttons, double-needle stitching throughout.", sizes:["S","M","L","XL","XXL"] },
+  { id:5, name:"Cashmere Knit", price:450, emoji:"🧣", desc:"Lightweight cashmere crew-neck knit. Two-ply construction for warmth without weight. Available in 8 colourways.", sizes:["XS","S","M","L","XL"] },
+  { id:6, name:"Leather Tote", price:680, emoji:"👜", desc:"Full-grain leather tote with antique brass hardware. Unlined interior with suede pocket. Made in Italy.", sizes:["One Size"] },
+];
+
+let cart = [];
+let currentProduct = null;
+let currentQty = 1;
+let selectedSize = null;
+let selectedPayment = 'card';
+
+// RENDER PRODUCTS
+function renderProducts() {
+  const grid = document.getElementById('products-grid');
+  grid.innerHTML = products.map(p => `
+    <div class="product-card" onclick="openModal(${p.id})">
+      <div class="product-img">
+        <span class="product-img-inner">${p.emoji}</span>
+        ${p.badge ? `<span class="product-badge">${p.badge}</span>` : ''}
+      </div>
+      <div class="product-info">
+        <h3>${p.name}</h3>
+        <div class="price">
+          ${p.origPrice ? `<span class="price-original">$${p.origPrice}</span>` : ''}
+          $${p.price}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// MODAL
+function openModal(id) {
+  const p = products.find(x => x.id === id);
+  currentProduct = p;
+  currentQty = 1;
+  selectedSize = null;
+  document.getElementById('qty-display').textContent = 1;
+  document.getElementById('modal-img').innerHTML = `<span style="font-size:8rem;opacity:0.3;">${p.emoji}</span>`;
+  document.getElementById('modal-name').textContent = p.name;
+  document.getElementById('modal-price').innerHTML = `${p.origPrice ? `<span class="price-original">$${p.origPrice}</span> ` : ''}$${p.price}`;
+  document.getElementById('modal-desc').textContent = p.desc;
+  document.getElementById('modal-sizes').innerHTML = p.sizes.map(s =>
+    `<button class="size-btn" onclick="selectSize(this,'${s}')">${s}</button>`
+  ).join('');
+  document.getElementById('modal-overlay').classList.add('active');
+}
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modal-overlay') || e.currentTarget.classList.contains('close-btn')) {
+    document.getElementById('modal-overlay').classList.remove('active');
+  }
+}
+function selectSize(btn, size) {
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedSize = size;
+}
+function changeQty(delta) {
+  currentQty = Math.max(1, currentQty + delta);
+  document.getElementById('qty-display').textContent = currentQty;
+}
+
+// CART
+function addToCart() {
+  if (!selectedSize && currentProduct.sizes[0] !== 'One Size') {
+    showToast('Please select a size');
+    return;
+  }
+  const size = selectedSize || 'One Size';
+  const existing = cart.find(i => i.id === currentProduct.id && i.size === size);
+  if (existing) { existing.qty += currentQty; }
+  else { cart.push({ ...currentProduct, size, qty: currentQty }); }
+  updateCartUI();
+  document.getElementById('modal-overlay').classList.remove('active');
+  showToast(`${currentProduct.name} added to bag`);
+  toggleCart();
+}
+function removeItem(id, size) {
+  cart = cart.filter(i => !(i.id === id && i.size === size));
+  updateCartUI();
+}
+function updateCartUI() {
+  const count = cart.reduce((a, i) => a + i.qty, 0);
+  document.getElementById('cart-count').textContent = count;
+  const list = document.getElementById('cart-items-list');
+  const footer = document.getElementById('cart-footer');
+  if (cart.length === 0) {
+    list.innerHTML = '<div class="empty-cart">Your bag is empty</div>';
+    footer.style.display = 'none';
+  } else {
+    list.innerHTML = cart.map(i => `
+      <div class="cart-item">
+        <div class="cart-item-img">${i.emoji}</div>
+        <div class="cart-item-details">
+          <h4>${i.name}</h4>
+          <p>Size: ${i.size} · Qty: ${i.qty}</p>
+          <div class="cart-item-price">$${(i.price * i.qty).toLocaleString()}</div>
+          <button class="remove-item" onclick="removeItem(${i.id},'${i.size}')">Remove</button>
+        </div>
+      </div>
+    `).join('');
+    const total = cart.reduce((a, i) => a + i.price * i.qty, 0);
+    document.getElementById('cart-total-amount').textContent = `$${total.toLocaleString()}`;
+    footer.style.display = 'block';
+  }
+}
+function toggleCart() {
+  document.getElementById('cart-drawer').classList.toggle('open');
+}
+
+// CHECKOUT
+function showCheckout() {
+  document.getElementById('cart-drawer').classList.remove('open');
+  const total = cart.reduce((a, i) => a + i.price * i.qty, 0);
+  const shipping = total >= 150 ? 0 : 15;
+  document.getElementById('checkout-order-summary').innerHTML = `
+    ${cart.map(i => `<div class="order-row"><span>${i.name} (${i.size}) ×${i.qty}</span><span>$${(i.price*i.qty).toLocaleString()}</span></div>`).join('')}
+    <div class="order-row"><span>Shipping</span><span>${shipping === 0 ? 'Free' : '$'+shipping}</span></div>
+    <div class="order-row total"><span>Total</span><span>$${(total+shipping).toLocaleString()}</span></div>
+  `;
+  document.getElementById('step-info').classList.add('active');
+  document.getElementById('step-success').classList.remove('active');
+  document.getElementById('checkout-overlay').classList.add('active');
+}
+function closeCheckout() {
+  document.getElementById('checkout-overlay').classList.remove('active');
+}
+function selectPayment(btn, type) {
+  document.querySelectorAll('.payment-method').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedPayment = type;
+  document.getElementById('card-fields').style.display = (type === 'card') ? 'block' : 'none';
+}
+function placeOrder() {
+  const fname = document.getElementById('fname').value;
+  const email = document.getElementById('email').value;
+  if (!fname || !email) { showToast('Please fill in required fields'); return; }
+  document.getElementById('step-info').classList.remove('active');
+  document.getElementById('step-success').classList.add('active');
+}
+function resetCart() {
+  cart = [];
+  updateCartUI();
+}
+
+// FORMATTING
+function formatCard(input) {
+  let v = input.value.replace(/\D/g,'').substring(0,16);
+  input.value = v.replace(/(.{4})/g,'$1 ').trim();
+}
+function formatExpiry(input) {
+  let v = input.value.replace(/\D/g,'');
+  if (v.length >= 2) v = v.substring(0,2) + '/' + v.substring(2,4);
+  input.value = v;
+}
+
+// TOAST
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+renderProducts();
+updateCartUI();
+</script>
+</body>
+</html>
